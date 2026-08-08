@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>August 17 — A Birthday Invitation</title>
+<meta name="description" content="A personal birthday experience" />
+
+<!-- Fonts: a serif for the emotional / invitation beats (in the spirit of Apple's own event-invite typography), a clean grotesk for interface + numerals -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Manrope:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- Ambient background layers -->
+<div class="bg-layer" aria-hidden="true">
+  <div class="orb orb-a"></div>
+  <div class="orb orb-b"></div>
+  <div class="orb orb-c"></div>
+  <div class="grain"></div>
+</div>
+<canvas id="particles" aria-hidden="true"></canvas>
+<div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+<!-- Progress rail / section nav -->
+<nav class="rail" id="rail" aria-label="Sections">
+  <div class="rail-track">
+    <button class="rail-dot" data-target="opening" aria-label="Opening"></button>
+    <button class="rail-dot" data-target="countdown" aria-label="Countdown"></button>
+    <button class="rail-dot" data-target="cake" aria-label="Make a wish"></button>
+    <button class="rail-dot" data-target="gallery" aria-label="Memories"></button>
+    <button class="rail-dot" data-target="quiz" aria-label="Quiz"></button>
+    <button class="rail-dot" data-target="message" aria-label="Leave a message"></button>
+    <button class="rail-dot" data-target="secret" aria-label="Secret"></button>
+    <button class="rail-dot" data-target="finale" aria-label="Finale"></button>
+  </div>
+</nav>
+
+<!-- Mini music player, floats top-right once entered -->
+<div class="player glass" id="player" hidden>
+  <div class="player-art" id="playerArt">
+    <svg viewBox="0 0 40 40" class="note-icon"><path d="M15 30a4 4 0 1 1-2-3.46V10.6l14-2.8v15.6a4 4 0 1 1-2-3.46V10.2l-10 2v14.34A4 4 0 0 1 15 30z" fill="currentColor"/></svg>
+  </div>
+  <div class="player-body">
+    <div class="player-title" id="playerTitle">Add your song — see assets/music</div>
+    <div class="player-bar">
+      <div class="player-progress" id="playerProgress"></div>
+    </div>
+  </div>
+  <button class="player-toggle" id="playerToggle" aria-label="Play or pause music">
+    <svg id="iconPlay" viewBox="0 0 24 24" width="16" height="16"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>
+    <svg id="iconPause" viewBox="0 0 24 24" width="16" height="16" hidden><path d="M6 5h4v14H6zM14 5h4v14h-4z" fill="currentColor"/></svg>
+  </button>
+  <audio id="audio" src="assets/music/birthday-song.mp3" preload="none" loop></audio>
+</div>
+
+<main id="app">
+
+  <!-- ============ OPENING ============ -->
+  <section class="screen opening" id="opening">
+    <div class="opening-stage">
+      <p class="eyebrow reveal-line" data-line="1">SAVE THE DATE</p>
+      <h1 class="opening-date reveal-line" data-line="2">August&nbsp;17</h1>
+      <p class="opening-sub reveal-line" data-line="3" id="agingLine">Someone's getting older&hellip;</p>
+      <p class="opening-heart reveal-line" data-line="4" id="happyLine">Happy Birthday to Me <span class="heart">❤</span></p>
+
+      <button class="enter-btn glass reveal-line" data-line="5" id="enterBtn">
+        <span>Enter My Birthday</span>
+        <svg viewBox="0 0 24 24" width="18" height="18"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <div class="scroll-hint" aria-hidden="true">
+      <span></span>
+    </div>
+  </section>
+
+  <!-- ============ COUNTDOWN ============ -->
+  <section class="screen countdown-screen" id="countdown">
+    <p class="eyebrow scroll-reveal">THE COUNTDOWN</p>
+    <h2 class="section-title scroll-reveal">Until it begins</h2>
+
+    <div class="countdown-grid scroll-reveal" id="countdownGrid">
+      <div class="count-card glass">
+        <span class="count-num" id="cd-days">00</span>
+        <span class="count-label">Days</span>
+      </div>
+      <div class="count-card glass">
+        <span class="count-num" id="cd-hours">00</span>
+        <span class="count-label">Hours</span>
+      </div>
+      <div class="count-card glass">
+        <span class="count-num" id="cd-mins">00</span>
+        <span class="count-label">Minutes</span>
+      </div>
+      <div class="count-card glass">
+        <span class="count-num" id="cd-secs">00</span>
+        <span class="count-label">Seconds</span>
+      </div>
+    </div>
+
+    <div class="its-my-day glass" id="itsMyDay" hidden>
+      <span>IT'S MY DAY</span> <span class="cake-emoji">🎂</span>
+    </div>
+  </section>
+
+  <!-- ============ CAKE ============ -->
+  <section class="screen cake-screen" id="cake">
+    <p class="eyebrow scroll-reveal">MAKE A WISH</p>
+    <h2 class="section-title scroll-reveal">Light it up, then blow</h2>
+
+    <div class="cake-stage scroll-reveal">
+      <div class="cake" id="cakeEl">
+        <div class="flames" id="flames">
+          <span class="flame"></span>
+          <span class="flame"></span>
+          <span class="flame"></span>
+          <span class="flame"></span>
+          <span class="flame"></span>
+        </div>
+        <div class="candles">
+          <span class="candle"></span>
+          <span class="candle"></span>
+          <span class="candle"></span>
+          <span class="candle"></span>
+          <span class="candle"></span>
+        </div>
+        <div class="cake-tier tier-top"><span class="drip"></span><span class="drip"></span><span class="drip"></span></div>
+        <div class="cake-tier tier-bottom"></div>
+        <div class="cake-plate"></div>
+      </div>
+
+      <div class="cake-controls">
+        <button class="glass ghost-btn" id="lightBtn">Light the candles</button>
+        <button class="glass ghost-btn" id="blowBtn" disabled>Blow out the candles</button>
+      </div>
+
+      <p class="wish-text" id="wishText" hidden>Make a Wish <span class="sparkle">✨</span></p>
+    </div>
+    <canvas id="confetti" aria-hidden="true"></canvas>
+  </section>
+
+  <!-- ============ GALLERY ============ -->
+  <section class="screen gallery-screen" id="gallery">
+    <p class="eyebrow scroll-reveal">MEMORY GALLERY</p>
+    <h2 class="section-title scroll-reveal">Moments, kept</h2>
+
+    <div class="gallery-grid scroll-reveal" id="galleryGrid"><!-- injected by JS from CONFIG.photos --></div>
+  </section>
+
+  <div class="modal" id="photoModal" aria-hidden="true">
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    <button class="modal-close glass" id="modalClose" aria-label="Close">
+      <svg viewBox="0 0 24 24" width="18" height="18"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <button class="modal-nav prev glass" id="modalPrev" aria-label="Previous photo">‹</button>
+    <div class="modal-frame glass" id="modalFrame">
+      <div class="modal-photo" id="modalPhoto"></div>
+      <p class="modal-caption" id="modalCaption"></p>
+    </div>
+    <button class="modal-nav next glass" id="modalNext" aria-label="Next photo">›</button>
+  </div>
+
+  <!-- ============ QUIZ ============ -->
+  <section class="screen quiz-screen" id="quiz">
+    <p class="eyebrow scroll-reveal">A LITTLE GAME</p>
+    <h2 class="section-title scroll-reveal">How Well Do You Know Me?</h2>
+
+    <div class="quiz-card glass scroll-reveal" id="quizCard">
+      <div class="quiz-progress">
+        <div class="quiz-progress-fill" id="quizProgressFill"></div>
+      </div>
+      <p class="quiz-count" id="quizCount">Question 1 of 5</p>
+      <h3 class="quiz-question" id="quizQuestion"></h3>
+      <div class="quiz-options" id="quizOptions"></div>
+      <p class="quiz-feedback" id="quizFeedback" hidden></p>
+    </div>
+
+    <div class="quiz-result glass" id="quizResult" hidden>
+      <p class="eyebrow">YOUR BIRTHDAY KNOWLEDGE</p>
+      <div class="quiz-score" id="quizScore">0/5</div>
+      <p class="quiz-result-line" id="quizResultLine"></p>
+      <button class="glass ghost-btn" id="quizReplay">Play Again</button>
+    </div>
+  </section>
+
+  <!-- ============ MESSAGE ============ -->
+  <section class="screen message-screen" id="message">
+    <p class="eyebrow scroll-reveal">FOR ME, FROM YOU</p>
+    <h2 class="section-title scroll-reveal">Leave a Birthday Message <span class="letter">💌</span></h2>
+
+    <form class="message-form glass scroll-reveal" id="messageForm">
+      <label class="field">
+        <span>Your name</span>
+        <input type="text" id="msgName" maxlength="40" placeholder="Who's writing?" autocomplete="off" required />
+      </label>
+      <label class="field">
+        <span>Your message</span>
+        <textarea id="msgText" maxlength="240" rows="3" placeholder="Say something nice..." required></textarea>
+      </label>
+      <button type="submit" class="glass ghost-btn">Send</button>
+    </form>
+
+    <div class="messages-wall" id="messagesWall"></div>
+  </section>
+
+  <!-- ============ SECRET ============ -->
+  <section class="screen secret-screen" id="secret">
+    <button class="secret-trigger glass" id="secretTrigger">
+      <span class="secret-eye">👀</span>
+      <span>Don't Tap This</span>
+    </button>
+
+    <div class="secret-reveal" id="secretReveal" hidden>
+      <p class="eyebrow">EASTER EGG FOUND</p>
+      <h2 class="section-title">You actually found the secret&hellip;</h2>
+      <p class="secret-note" id="secretNote">
+        Since you went looking — thank you. For being someone who pays attention, who shows up,
+        and who makes ordinary days feel worth celebrating. This one's just for you.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ FINALE ============ -->
+  <section class="screen finale-screen" id="finale">
+    <div class="finale-stage scroll-reveal">
+      <p class="eyebrow">THANK YOU</p>
+      <h2 class="finale-title">Thank You For Being<br/>Part Of My Day <span class="heart">❤</span></h2>
+      <p class="finale-date">August 17, 2026</p>
+      <button class="enter-btn glass" id="replayBtn">
+        <span>Replay My Birthday</span>
+        <svg viewBox="0 0 24 24" width="18" height="18"><path d="M4 4v6h6M20 20v-6h-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.5 15a8 8 0 1 0 2-8.5L4 10M19.5 9a8 8 0 1 0-2 8.5l2-2.5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </section>
+
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
